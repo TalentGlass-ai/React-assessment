@@ -9,6 +9,9 @@
 **a.** What are React hooks, and how do they improve component logic compared to class-based components?
 *Your answer:*
 
+React hooks are functions that let us to use state and lifecycle features in functional components hooks eg:useState, useEffect, and useContext etc.
+They improve component logic by making it easier to share and reuse stateful logic through custom hooks,Hooks also help reduce code duplication and make components more readable by grouping related logic together.
+
 **b.** Explain how you would optimize rendering performance in a React app with a long list (e.g., hundreds of job postings).
 *Your answer:*
 
