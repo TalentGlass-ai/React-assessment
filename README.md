@@ -15,8 +15,16 @@ They improve component logic by making it easier to share and reuse stateful log
 **b.** Explain how you would optimize rendering performance in a React app with a long list (e.g., hundreds of job postings).
 *Your answer:*
 
+ I will ensure each list item has a stable key.
+ I will wrap heavy child components with React.memo to prevent unnecessary re-renders.
+ Pagination can further reduce the rendering load and improve performance.
+
 **c.** Describe your preferred approach to managing form state and validation in React.
 *Your answer:*
+
+I prefer using useState or useReducer to manage form state. 
+For validation, I like using library such as Formik with Yup as they handle validation rules, errors.
+This approach keeps the code clean,
 
 ## 2. Core Coding Challenge
 
@@ -69,11 +77,60 @@ function JobList({ jobs }) {
 **a.** What is wrong or could be improved?
 *Your answer:*
 
+1. Missing key prop in list items
+In React, when rendering lists with .map(), each element should have a unique key to help React efficiently update the DOM.
+Without it, you may get a warning and possible rendering performance issues.
+
+2. Search state is unused
+The search state is being updated, but it doesn’t actually affect the displayed job list.
+If search is used for filter based on search input, we should apply filter before mapping.
+
+
 **b.** Provide your improved code and explain your changes.
 
 *Your improved code:*
 
+```jsx
+import React, { useEffect, useState } from "react";
+
+function JobList({ jobs }) {
+  const [search, setSearch] = useState("");
+  const [filterJobs, setFilterJobs] = useState(jobs || []);
+
+  const handleFilter = (searchValue) => {
+    let value =searchValue.trim()
+    let jobsArray =filterJobs.length>0?filterJobs:jobs
+    if (!value) {
+      setFilterJobs(jobs);
+      return 
+    }
+    let result = jobsArray.filter((job) =>
+      job.title.toLowerCase().includes(value)
+    );
+    setFilterJobs(result);
+  };
+  useEffect(() => {
+    handleFilter (search);
+  }, [search]);
+  return (
+    <div>
+      <input value={search} onChange={(e) => setSearch(e.target.value)} />
+      <ul>
+        {filterJobs.map((job) => (
+          <li key={job.id}>
+            {job.title} at {job.company}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+export default JobList;
+```
 *Explanation of changes:*
+
+1) First, I have added the key prop in list items in the map to help React efficiently update the DOM. 
+2) And then I am using search to filter the list to achieve this, I have used the handleFilter function, which filters the list based on the search input change.
 
 ## 4. Performance Scenario
 
@@ -81,7 +138,14 @@ function JobList({ jobs }) {
 
 **a.** Two techniques to improve performance of a job list with 500+ items:
 
+1) For a large job list, use list virtualisation (e.g., react-window) so only visible items are rendered at a time.
+2) We can implement pagination to load data in chunks instead of all 500+ items at once.
+
+
 **b.** How to avoid unnecessary re-renders in a job card component:
+
+To avoid unnecessary re-render, wrap the job card component with React.memo so it only re-renders when props change.
+If any prop or function is passed on the job card component, use useMemo or useCallback to memoized it.
 
 ## Submission Checklist
 
